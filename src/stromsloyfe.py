@@ -31,7 +31,7 @@ k_R = 0.07
 
 d_mu = 0.01 * 10**(-6)
 d_N = 0
-d_I = 0.01
+d_I = 0.05
 d_R = 0.0001
 d_x = 0.0005
 
@@ -65,7 +65,7 @@ x_space = np.linspace(-3, 3, 200)
 
 print(unc)
 print(current_unc)
-plt.plot(x_space, (1+x_space**2)**(-3/2), '-', color='black', label=r"$B$")
+plt.plot(x_space, ((k_N*k_mu*k_I)/(2*k_R))*(1+x_space**2)**(-3/2) * 10**4 / b2_values[9], '-', color='black', label=r"$B$")
 plt.errorbar(x_unitless, b2_unitless, yerr=np.array(current_unc), linestyle="None", marker='.', color='black', label='Målepunkter')
 plt.xlabel(r"$x/R$")
 plt.ylabel(r"$B(x/R)/B(0)$")

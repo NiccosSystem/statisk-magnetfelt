@@ -56,7 +56,7 @@ a_05r = 0.5*k_R
 
 d_mu = 0.01 * 10**(-6)
 d_N = 0
-d_I = 0.01
+d_I = 0.05
 d_R = 0.0001
 d_x = 0.0005
 d_a = 0.001
@@ -97,19 +97,23 @@ c_unc05r = np.multiply(b205r_unitless, np.array(gauss_05r))
 
 x_space = np.linspace(-3, 3, 200)
 
-fr = (1/2)*((1+(x_space-(a_r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_r/(2*k_R)))**2)**(-3/2)) * ((1+(a_r/(2*k_R))**2)**(3/2))
-f2r = (1/2)*((1+(x_space-(a_2r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_2r/(2*k_R)))**2)**(-3/2)) * ((1+(a_2r/(2*k_R))**2)**(3/2))
-f05r = (1/2)*((1+(x_space-(a_05r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_05r/(2*k_R)))**2)**(-3/2)) * ((1+(a_05r/(2*k_R))**2)**(3/2))
+#fr = (1/2)*((1+(x_space-(a_r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_r/(2*k_R)))**2)**(-3/2)) * ((1+(a_r/(2*k_R))**2)**(3/2))
+#f2r = (1/2)*((1+(x_space-(a_2r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_2r/(2*k_R)))**2)**(-3/2)) * ((1+(a_2r/(2*k_R))**2)**(3/2))
+#f05r = (1/2)*((1+(x_space-(a_05r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_05r/(2*k_R)))**2)**(-3/2)) * ((1+(a_05r/(2*k_R))**2)**(3/2))
+
+fr = ((k_N*k_mu*k_I)/(2*k_R))*((1+(x_space-(a_r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_r/(2*k_R)))**2)**(-3/2)) * 10**4 / b2r_values[11]
+f2r = ((k_N*k_mu*k_I)/(2*k_R))*((1+(x_space-(a_2r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_2r/(2*k_R)))**2)**(-3/2)) * 10**4 / b22r_values[11]
+f05r = ((k_N*k_mu*k_I)/(2*k_R))*((1+(x_space-(a_05r/(2*k_R)))**2)**(-3/2)+(1+(x_space+(a_05r/(2*k_R)))**2)**(-3/2)) * 10**4 / b205r_values[11]
 
 print(c_uncr)
 #print(current_unc)
 #plt.plot(x_space, (1+x_space**2)**(-3/2), '-', color='black', label=r"$B$")
-plt.plot(x_space, fr, '-')
-plt.plot(x_space, f2r, '-')
-plt.plot(x_space, f05r, '-')
-plt.errorbar(x_unitless, b2r_unitless, yerr=np.array(c_uncr), linestyle="None", marker='.', color='black', label='Målepunkter')
-plt.errorbar(x_unitless, b22r_unitless, yerr=np.array(c_unc2r), linestyle="None", marker='.', color='blue', label='Målepunkter')
-plt.errorbar(x_unitless, b205r_unitless, yerr=np.array(c_unc05r), linestyle="None", marker='.', color='red', label='Målepunkter')
+plt.plot(x_space, fr, '-', color='black', label=r"a=R")
+plt.plot(x_space, f2r, '-', color='blue', label=r"a=2R")
+plt.plot(x_space, f05r, '-', color='red', label=r"a=R/2")
+plt.errorbar(x_unitless, b2r_unitless, yerr=np.array(c_uncr), linestyle="None", marker='.', color='black', label="Målepunkter")
+plt.errorbar(x_unitless, b22r_unitless, yerr=np.array(c_unc2r), linestyle="None", marker='.', color='blue')
+plt.errorbar(x_unitless, b205r_unitless, yerr=np.array(c_unc05r), linestyle="None", marker='.', color='red')
 plt.xlabel(r"$x/R$")
 plt.ylabel(r"$B(x/R)/B(0)$")
 plt.legend()

@@ -51,7 +51,7 @@ constants = [x_values, k_R, k_I, k_mu, k_N, k_l]
 
 d_mu = 0.01 * 10**(-6)
 d_N = 0
-d_I = 0.01
+d_I = 0.05
 d_R = 0.0001
 d_x = 0.0005
 d_l = 0.0001
@@ -84,7 +84,9 @@ c_unc = np.multiply(b2_unitless, np.array(gauss_s))
 
 z = np.linspace(-2, 12, 500)
 
-sf = ((z/((1+z**2)**(1/2))) + (k_l-z*k_R)/(((k_l-z*k_R)**2 + k_R**2)**(1/2))) / (k_l/((k_l**2 + k_R**2)**(1/2)))
+#sf = ((z/((1+z**2)**(1/2))) + (k_l-z*k_R)/(((k_l-z*k_R)**2 + k_R**2)**(1/2))) / (k_l/((k_l**2 + k_R**2)**(1/2)))
+
+sf = ((k_N*k_mu*k_I)/(2*k_l))*((z/((1+z**2)**(1/2))) + (k_l-z*k_R)/(((k_l-z*k_R)**2 + k_R**2)**(1/2))) * 10**4 / b2_values[7]
 
 print(c_unc)
 #print(current_unc)
