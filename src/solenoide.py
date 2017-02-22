@@ -3,6 +3,7 @@ from scipy.misc import derivative
 from matplotlib import pyplot as plt
 import math
 
+#test
 def P_D(func, index, points):
     points_copy = points[:] #Copy points as not to alter the points
     def as_func_of(x):      #Need to input the function as a one variable function
