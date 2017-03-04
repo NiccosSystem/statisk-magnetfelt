@@ -3,6 +3,7 @@ from scipy.misc import derivative
 from matplotlib import pyplot as plt
 import math
 
+#Tar partiellderivert av funksjon
 def P_D(func, index, points):
     points_copy = points[:] #Copy points as not to alter the points
     def as_func_of(x):      #Need to input the function as a one variable function
@@ -10,6 +11,7 @@ def P_D(func, index, points):
         return func(*points_copy) #Now it is only a function of points[index]. Need star to input a list as arguments
     return derivative(as_func_of, points[index], dx = 1e-6) #See manual to scipy.misc.derivative
 
+#Henter inn data fra fil og legger det i en numpy-array
 def get_values(file):
     values = []
     data = open(file, 'r')
@@ -18,28 +20,34 @@ def get_values(file):
             values.append(float(line))
     return np.array(values)
 
+#Funksjonen for en strømsløyfe
 def stromsloyfe(x, R, I, mu, N):
     return ((N*mu*I)/(2*R))*(1+(x/R)**2)**(-3/2)
 
+#x-verdier i meter og b2-verdier
 x_values = get_values("1-x.txt")
 b2_values = get_values("1-b2.txt")
 
+#Konstante verdier for mu, N, I og R
 k_mu = 1.26 * 10**(-6)
 k_N = 330
 k_I = 1
 k_R = 0.07
 
+#Usikkerheten i de forskjellige variablene
 d_mu = 0.01 * 10**(-6)
 d_N = 0
 d_I = 0.05
 d_R = 0.0001
 d_x = 0.0005
 
+#De partiellderiverte
 delx_value = P_D(stromsloyfe, 0, [x_values, k_R, k_I, k_mu, k_N])
 delI_value = P_D(stromsloyfe, 2, [x_values, k_R, k_I, k_mu, k_N])
 delR_value = P_D(stromsloyfe, 1, [x_values, k_R, k_I, k_mu, k_N])
 print(delx_value)
 
+#Her lages gauss-verdier for alle variablene med henhold til måleverdier NB!! SKAL EGENTLIG VÆRE TEORETISKE VERDIER, IKKE MÅLEVERDIER!!
 unc = []
 i = 0
 while i < len(x_values):
@@ -47,28 +55,19 @@ while i < len(x_values):
     unc.append(math.sqrt(squared))
     i += 1
 
-b2_unitless = []
-for value in b2_values:
-    b2_unitless.append(value/b2_values[9])
+#Multipliser elemtnvis alle gauss-utregninger med måleverdi for å få absolutt usikkerhet NB! SE OVENFOR
+current_unc = np.multiply(b2_values, unc)
 
-x_unitless = []
-for value in x_values:
-    x_unitless.append(value/k_R)
+#Lage linspace for teoretiske verdier
+x_space = np.linspace(-0.2, 0.2, 500)
 
-current_unc = []
-i = 0
-while i < len(b2_unitless):
-    current_unc.append(b2_unitless[i]*unc[i])
-    i += 1
-
-x_space = np.linspace(-3, 3, 200)
-
+#Plotte shit
 print(unc)
 print(current_unc)
-plt.plot(x_space, ((k_N*k_mu*k_I)/(2*k_R))*(1+x_space**2)**(-3/2) * 10**4 / b2_values[9], '-', color='black', label=r"$B$")
-plt.errorbar(x_unitless, b2_unitless, yerr=np.array(current_unc), linestyle="None", marker='.', color='black', label='Målepunkter')
-plt.xlabel(r"$x/R$")
-plt.ylabel(r"$B(x/R)/B(0)$")
+plt.plot(x_space, 10**4 * ((k_N*k_mu*k_I)/(2*k_R))*(1+(x_space/k_R)**2)**(-3/2), '-', color='black', label=r"$B$")
+plt.errorbar(x_values, b2_values, yerr=np.array(current_unc), linestyle="None", marker='.', color='black', label='Målepunkter')
+plt.xlabel(r"$x$ (m)", size=18)
+plt.ylabel(r"$B(x)$ (Gauss)", size=18)
 plt.legend()
 plt.show()
 
