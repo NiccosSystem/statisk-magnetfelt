@@ -28,6 +28,7 @@ def gauss(x_val, b2_val, variables, uncertains, func):
     i = 0
     while i < len(variables):
         partial = np.array(P_D(func, i, variables))
+        print("partial {0}".format(partial))
         step1 = partial*uncertains[i]
         c_unc = (10**4 * np.multiply(step1, reci))**2
         i += 1
@@ -54,7 +55,7 @@ k_R = 0.05
 k_l = 0.397
 
 #x-verdier pluss konstanter inn i array
-constants = [x_values, k_R, k_I, k_mu, k_N, k_l]
+#constants = [x_values, k_R, k_I, k_mu, k_N, k_l]
 
 #usikkerheter inni array
 d_mu = 0
@@ -66,26 +67,38 @@ d_l = 0.0001
 uncertainties = [d_x, d_R, d_I, d_mu, d_N, d_l]
 
 #gauss for solenoide
-gauss_s = gauss(x_values, b2_values, constants, uncertainties, solf)
+#gauss_s = gauss(x_values, b2_values, constants, uncertainties, solf)
 
-print(gauss_s)
+#print(gauss_s)
 
 #gange gauss med funksjonsverdier NB! skal egentlig ganges med teoretiske verdier etc
-c_unc = np.multiply(b2_values, np.array(gauss_s))
+#c_unc = np.multiply(b2_values, np.array(gauss_s))
 
 #linspace for teoretiske verdier
 z = np.linspace(-0.10, 0.60, 500)
 
 #funksjon for solenoide
+
 sf = 10**4 * ((k_N*k_mu*k_I)/(2*k_l))*((z/((z**2+k_R**2)**(1/2)))+((k_l-z)/(((k_l-z)**2 + k_R**2)**(1/2))))
+print(len(z), len(sf))
+constants = [z, k_R, k_I, k_mu, k_N, k_l]
+gauss_teoretisk = gauss(z, np.array(sf), constants, uncertainties, solf)
+c_unc = np.multiply(sf, np.array(gauss_teoretisk))
 
 #plotte shit
 print(c_unc)
-plt.plot(z, sf, '-', color='black', label=r"$B$")
-plt.errorbar(x_values, b2_values, yerr=np.array(c_unc), linestyle="None", marker='.', color='black', label='Målepunkter')
+
+f, axs = plt.subplots(2, sharex=True)
+
+axs[0].plot(z, sf, '-', color='black', label=r"$B$")
+axs[0].scatter(x_values, b2_values, marker='o', color='black', label='Målepunkter')
 plt.xlabel(r"$x$ (m)", size=18)
 plt.ylabel(r"$B(x)$ (Gauss)", size=18)
+f.add_subplot(111, frameon=False)
+plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 plt.legend()
+
+#plt.subplot()
 plt.show()
 
 
