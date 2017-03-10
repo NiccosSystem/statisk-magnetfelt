@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import gridspec
 from scipy.misc import derivative
 from matplotlib import pyplot as plt
 import math
@@ -42,33 +43,52 @@ d_R = 0.0001
 d_x = 0.0005
 
 #De partiellderiverte
-delx_value = P_D(stromsloyfe, 0, [x_values, k_R, k_I, k_mu, k_N])
-delI_value = P_D(stromsloyfe, 2, [x_values, k_R, k_I, k_mu, k_N])
-delR_value = P_D(stromsloyfe, 1, [x_values, k_R, k_I, k_mu, k_N])
+x_space = np.linspace(-0.2, 0.2, 500)
+y_theoretical = 10**4 * ((k_N*k_mu*k_I)/(2*k_R))*(1+(x_space/k_R)**2)**(-3/2) * x_space
+
+delx_value = P_D(stromsloyfe, 0, [x_space, k_R, k_I, k_mu, k_N])
+delI_value = P_D(stromsloyfe, 2, [x_space, k_R, k_I, k_mu, k_N])
+delR_value = P_D(stromsloyfe, 1, [x_space, k_R, k_I, k_mu, k_N])
 print(delx_value)
+
 
 #Her lages gauss-verdier for alle variablene med henhold til måleverdier NB!! SKAL EGENTLIG VÆRE TEORETISKE VERDIER, IKKE MÅLEVERDIER!!
 unc = []
 i = 0
-while i < len(x_values):
-    squared = (delx_value[i] * d_x * (10**(-4)*b2_values[i]**(-1)))**2 + (delI_value[i] * d_I * (10**(-4)*b2_values[i])**(-1))**2 + (delR_value[i] * d_R * (10**(-4)*b2_values[i])**(-1))**2
+while i < len(x_space):
+    squared = (delx_value[i] * d_x * (10**(-4)*y_theoretical[i]**(-1)))**2 + (delI_value[i] * d_I * (10**(-4)*y_theoretical[i])**(-1))**2 + (delR_value[i] * d_R * (10**(-4)*y_theoretical[i])**(-1))**2
     unc.append(math.sqrt(squared))
     i += 1
 
-#Multipliser elemtnvis alle gauss-utregninger med måleverdi for å få absolutt usikkerhet NB! SE OVENFOR
-current_unc = np.multiply(b2_values, unc)
 
 #Lage linspace for teoretiske verdier
-x_space = np.linspace(-0.2, 0.2, 500)
+
+
+#Multipliser elemtnvis alle gauss-utregninger med måleverdi for å få absolutt usikkerhet NB! SE OVENFOR
+
+current_unc = np.multiply(y_theoretical, unc)
+
+avvik = b2_values - (10**4 * ((k_N*k_mu*k_I)/(2*k_R))*(1+(x_values/k_R)**2)**(-3/2))
 
 #Plotte shit
 print(unc)
 print(current_unc)
-plt.plot(x_space, 10**4 * ((k_N*k_mu*k_I)/(2*k_R))*(1+(x_space/k_R)**2)**(-3/2), '-', color='black', label=r"$B$")
-plt.errorbar(x_values, b2_values, yerr=np.array(current_unc), linestyle="None", marker='.', color='black', label='Målepunkter')
+#f, (ax1, ax2) = plt.subplots(2, sharex=True)
+f = plt.figure()
+gs = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
+ax1 = plt.subplot(gs[0])
+ax2 = plt.subplot(gs[1], sharex=ax1)
+ax1.plot(x_space, 10**4 * ((k_N*k_mu*k_I)/(2*k_R))*(1+(x_space/k_R)**2)**(-3/2), '-', color='black', label=r"$B$")
+ax1.scatter(x_values, b2_values, marker='.', color='black', label='Målepunkter')
+ax2.plot(x_space, np.abs(current_unc), '-', color="0")
+ax2.plot(x_space, -np.abs(current_unc), '-', color="0")
+ax2.scatter(x_values, avvik, marker='.', color="0")
 plt.xlabel(r"$x$ (m)", size=18)
-plt.ylabel(r"$B(x)$ (Gauss)", size=18)
-plt.legend()
+plt.xlim([min(x_space)*1.05, max(x_space)*1.05])
+f.text(0.04, 0.5, r"$B(x)$ (Gauss)", va='center', rotation='vertical', size=18)
+#plt.ylabel(r"$B(x)$ (Gauss)", size=18)
+ax1.legend()
+#plt.tight_layout()
 plt.show()
 
 

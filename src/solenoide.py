@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import gridspec
 from scipy.misc import derivative
 from matplotlib import pyplot as plt
 import math
@@ -80,23 +81,41 @@ z = np.linspace(-0.10, 0.60, 500)
 #funksjon for solenoide
 
 sf = 10**4 * ((k_N*k_mu*k_I)/(2*k_l))*((z/((z**2+k_R**2)**(1/2)))+((k_l-z)/(((k_l-z)**2 + k_R**2)**(1/2))))
-print(len(z), len(sf))
+#print(len(z), len(sf))
 constants = [z, k_R, k_I, k_mu, k_N, k_l]
-gauss_teoretisk = gauss(z, np.array(sf), constants, uncertainties, solf)
+gauss_teoretisk = gauss(z, sf, constants, uncertainties, solf)
 c_unc = np.multiply(sf, np.array(gauss_teoretisk))
 
+avvik = b2_values - (10**4 * ((k_N*k_mu*k_I)/(2*k_l))*((x_values/((x_values**2+k_R**2)**(1/2)))+((k_l-x_values)/(((k_l-x_values)**2 + k_R**2)**(1/2)))))
 #plotte shit
-print(c_unc)
+#print(c_unc)
 
-f, axs = plt.subplots(2, sharex=True)
+#f, axs = plt.subplots(2, sharex=True)
 
-axs[0].plot(z, sf, '-', color='black', label=r"$B$")
-axs[0].scatter(x_values, b2_values, marker='o', color='black', label='Målepunkter')
+#axs[0].plot(z, sf, '-', color='black', label=r"$B$")
+#axs[0].scatter(x_values, b2_values, marker='o', color='black', label='Målepunkter')
+#plt.xlabel(r"$x$ (m)", size=18)
+#plt.ylabel(r"$B(x)$ (Gauss)", size=18)
+#f.add_subplot(111, frameon=False)
+#plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+#plt.legend()
+
+xlim = [min(x_values)*1.05, max(x_values)*1.05]
+
+fur = plt.figure(1)
+gsr = gridspec.GridSpec(2, 1, height_ratios=[3, 1])
+ax1r = plt.subplot(gsr[0])
+ax2r = plt.subplot(gsr[1], sharex=ax1r)
+ax1r.plot(z, sf, '-', color='0', label=r'$B(a=R)$')
+ax1r.scatter(x_values, b2_values, marker='.', color='0', label="Målepunkter")
+ax2r.plot(z, np.abs(c_unc), '-', color="0")
+ax2r.plot(z, -np.abs(c_unc), '-', color="0")
+ax2r.scatter(x_values, avvik, marker='.', color="0")
+fur.text(0.04, 0.5, r"$B(x)$ (Gauss)", va='center', rotation='vertical', size=18)
+ax1r.legend()
+plt.xlim(xlim)
 plt.xlabel(r"$x$ (m)", size=18)
-plt.ylabel(r"$B(x)$ (Gauss)", size=18)
-f.add_subplot(111, frameon=False)
-plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-plt.legend()
+#plt.tight_layout()
 
 #plt.subplot()
 plt.show()
